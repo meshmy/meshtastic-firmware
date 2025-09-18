@@ -169,8 +169,9 @@ const RegionInfo regions[] = {
         Malaysia
         433 - 435 MHz at 100mW, no restrictions.
         https://www.mcmc.gov.my/skmmgovmy/media/General/pdf/Short-Range-Devices-Specification.pdf
+        Note: MY Tx power limit removed for my_hams branch. Not for general and/or unlicensed use.
     */
-    RDEF(MY_433, 433.0f, 435.0f, 100, 20, false, false, PROFILE_STD),
+    RDEF(MY_433, 433.0f, 435.0f, 100, 0, false, false, PROFILE_STD),
 
     /*
         Malaysia
@@ -178,8 +179,9 @@ const RegionInfo regions[] = {
         923 - 924 MHz at 500mW with 1% duty cycle OR frequency hopping.
         Frequency hopping is used for 919 - 923 MHz.
         https://www.mcmc.gov.my/skmmgovmy/media/General/pdf/Short-Range-Devices-Specification.pdf
+        Note: MY Tx power limit removed for my_hams branch. Not for general and/or unlicensed use.
     */
-    RDEF(MY_919, 919.0f, 924.0f, 100, 27, true, false, PROFILE_STD),
+    RDEF(MY_919, 919.0f, 924.0f, 100, 0, true, false, PROFILE_STD),
 
     /*
         Singapore
