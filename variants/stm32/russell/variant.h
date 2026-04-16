@@ -8,10 +8,12 @@
 #define LED_STATE_ON 1
 #define BUTTON_PIN PH3 // Shared with BOOT0
 #define BUTTON_NEED_PULLUP
-// Charger IC charge/standby pins are open-drain with no hardware pull-up:
-// Internal pull-up is needed on STM32 (TODO)
-// #define EXT_CHRG_DETECT PA5
-// #define EXT_PWR_DETECT PA4
+// Consonance charger IC: charge/standby indicator pins are open-drain active-low
+// with no hardware pull-up — INPUT_PULLUP required to read idle (HIGH) state
+#define EXT_CHRG_DETECT PA5
+#define EXT_CHRG_DETECT_MODE INPUT_PULLUP
+#define EXT_PWR_DETECT PA4
+#define EXT_PWR_DETECT_MODE INPUT_PULLUP
 
 #define BATTERY_PIN AVBAT
 // ADC_MULTIPLIER: 3.0 = internal 1:3 bridge divider (DS13105§3.18.3)
