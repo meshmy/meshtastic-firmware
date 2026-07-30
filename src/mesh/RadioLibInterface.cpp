@@ -90,6 +90,8 @@ void INTERRUPT_ATTR RadioLibInterface::isrTxLevel0()
 /** Our ISR code currently needs this to find our active instance
  */
 RadioLibInterface *RadioLibInterface::instance;
+volatile bool RadioLibInterface::loraInError = false;
+uint8_t RadioLibInterface::loraReinitAttempts = 0;
 
 /** Could we send right now (i.e. either not actively receiving or transmitting)? */
 bool RadioLibInterface::canSendImmediately()

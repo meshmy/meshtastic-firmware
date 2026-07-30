@@ -177,6 +177,8 @@ template <typename T> bool LR11x0Interface<T>::reconfigure()
     int err = lora.setSpreadingFactor(sf);
     if (err != RADIOLIB_ERR_NONE)
         RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_INVALID_RADIO_SETTING);
+    if (err == RADIOLIB_ERR_WRONG_MODEM)
+        RadioLibInterface::loraInError = true;
 
     err = lora.setBandwidth(bw, wideLora() && (getFreq() > 1000.0f));
     if (err != RADIOLIB_ERR_NONE)
@@ -231,7 +233,7 @@ template <typename T> void LR11x0Interface<T>::setStandby()
 
     if (err != RADIOLIB_ERR_NONE) {
         LOG_DEBUG("LR11x0 standby failed with error %d", err);
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
     }
 
     isReceiving = false; // If we were receiving, not any more
@@ -278,7 +280,7 @@ template <typename T> void LR11x0Interface<T>::startReceive()
         lora.startReceive(RADIOLIB_LR11X0_RX_TIMEOUT_INF, MESHTASTIC_RADIOLIB_IRQ_RX_FLAGS, RADIOLIB_IRQ_RX_DEFAULT_MASK, 0);
     if (err) {
         LOG_ERROR("StartReceive error: %d", err);
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
     }
 
     RadioLibInterface::startReceive();
@@ -308,7 +310,7 @@ template <typename T> bool LR11x0Interface<T>::isChannelActive()
         return true;
 
     if (result == RADIOLIB_ERR_WRONG_MODEM)
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
 
     return false;
 }

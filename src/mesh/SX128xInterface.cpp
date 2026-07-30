@@ -121,6 +121,8 @@ template <typename T> bool SX128xInterface<T>::reconfigure()
     int err = lora.setSpreadingFactor(sf);
     if (err != RADIOLIB_ERR_NONE)
         RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_INVALID_RADIO_SETTING);
+    if (err == RADIOLIB_ERR_WRONG_MODEM)
+        RadioLibInterface::loraInError = true;
 
     err = lora.setBandwidth(bw);
     if (err != RADIOLIB_ERR_NONE)
@@ -177,7 +179,7 @@ template <typename T> void SX128xInterface<T>::setStandby()
 
     if (err != RADIOLIB_ERR_NONE) {
         LOG_ERROR("SX128x standby %s%d", radioLibErr, err);
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
     }
 #if ARCH_PORTDUINO
     if (portduino_config.lora_rxen_pin.pin != RADIOLIB_NC) {
@@ -269,7 +271,7 @@ template <typename T> void SX128xInterface<T>::startReceive()
 
     if (err != RADIOLIB_ERR_NONE) {
         LOG_ERROR("SX128X startReceive %s%d", radioLibErr, err);
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
     }
 
     RadioLibInterface::startReceive();
@@ -300,7 +302,7 @@ template <typename T> bool SX128xInterface<T>::isChannelActive()
     if (result != RADIOLIB_CHANNEL_FREE)
         LOG_ERROR("SX128X scanChannel %s%d", radioLibErr, result);
     if (result == RADIOLIB_ERR_WRONG_MODEM)
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
+        RadioLibInterface::loraInError = true;
 
     return false;
 }

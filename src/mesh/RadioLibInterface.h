@@ -124,6 +124,9 @@ class RadioLibInterface : public RadioInterface, protected concurrency::Notified
      */
     static RadioLibInterface *instance;
 
+    static volatile bool loraInError;
+    static uint8_t loraReinitAttempts;
+
     /** Clear instance on destruction so stale pointer checks in loop() are safe */
     virtual ~RadioLibInterface()
     {

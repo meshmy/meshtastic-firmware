@@ -1447,9 +1447,15 @@ void loop()
     if (portduino_config.lora_spi_dev == "ch341" && ch341Hal != nullptr) {
         ch341Hal->checkError();
     }
-    if (portduino_status.LoRa_in_error && rebootAtMsec == 0) {
+    if (portduino_status.LoRa_in_error)
+        RadioLibInterface::loraInError = true;
+#endif
+    if (RadioLibInterface::loraInError && rebootAtMsec == 0) {
         LOG_ERROR("LoRa in error detected, attempting to recover");
+        if (RadioLibInterface::instance)
+            RadioLibInterface::instance->disableInterrupt();
         router->addInterface(nullptr);
+#if ARCH_PORTDUINO
         if (portduino_config.lora_spi_dev == "ch341") {
             if (ch341Hal != nullptr) {
                 delete ch341Hal;
@@ -1465,18 +1471,31 @@ void loop()
                 exit(EXIT_FAILURE);
             }
         }
+#endif
         auto rIf = initLoRa();
         if (rIf) {
             router->addInterface(std::move(rIf));
+            RadioLibInterface::loraInError = false;
+            RadioLibInterface::loraReinitAttempts = 0;
+#if ARCH_PORTDUINO
             portduino_status.LoRa_in_error = false;
+#endif
         } else {
+#if ARCH_PORTDUINO
             LOG_WARN("Reconfigure failed, rebooting");
             if (screen) {
                 screen->showSimpleBanner("Rebooting...");
             }
             rebootAtMsec = millis() + 25;
+#else
+            if (++RadioLibInterface::loraReinitAttempts > 1) {
+                RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_NO_RADIO);
+                RadioLibInterface::loraInError = false;
+            }
+#endif
         }
     }
+#if ARCH_PORTDUINO
 #if HAS_TFT
     if (screen && portduino_config.displayPanel == x11 &&
         config.display.displaymode != meshtastic_Config_DisplayConfig_DisplayMode_COLOR) {

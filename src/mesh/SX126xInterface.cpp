@@ -193,6 +193,8 @@ template <typename T> bool SX126xInterface<T>::reconfigure()
     int err = lora.setSpreadingFactor(sf);
     if (err != RADIOLIB_ERR_NONE)
         RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_INVALID_RADIO_SETTING);
+    if (err == RADIOLIB_ERR_WRONG_MODEM)
+        RadioLibInterface::loraInError = true;
 
     err = lora.setBandwidth(bw);
     if (err != RADIOLIB_ERR_NONE)
@@ -317,10 +319,9 @@ template <typename T> void SX126xInterface<T>::setStandby()
 
     if (err != RADIOLIB_ERR_NONE) {
         LOG_DEBUG("SX126x standby %s%d", radioLibErr, err);
+        RadioLibInterface::loraInError = true;
 #ifdef ARCH_PORTDUINO
         portduino_status.LoRa_in_error = true;
-#else
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
 #endif
     }
     isReceiving = false; // If we were receiving, not any more
@@ -374,10 +375,9 @@ template <typename T> void SX126xInterface<T>::startReceive()
 #endif
     if (err != RADIOLIB_ERR_NONE) {
         LOG_ERROR("SX126X %s %s%d", rxMethod, radioLibErr, err);
+        RadioLibInterface::loraInError = true;
 #ifdef ARCH_PORTDUINO
         portduino_status.LoRa_in_error = true;
-#else
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
 #endif
     }
 
@@ -409,10 +409,9 @@ template <typename T> bool SX126xInterface<T>::isChannelActive()
     if (result != RADIOLIB_CHANNEL_FREE)
         LOG_ERROR("SX126X scanChannel %s%d", radioLibErr, result);
     if (result == RADIOLIB_ERR_WRONG_MODEM) {
+        RadioLibInterface::loraInError = true;
 #ifdef ARCH_PORTDUINO
         portduino_status.LoRa_in_error = true;
-#else
-        RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_RADIO_SPI_BUG);
 #endif
     }
 
