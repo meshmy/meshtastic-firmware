@@ -2505,7 +2505,7 @@ void menuHandler::cellularToggleMenu()
     bannerOptions.optionsArrayPtr = optionsArray;
     bannerOptions.optionsCount = 3;
     // The modem state machine handles power-down and power-up, so unlike WiFi
-    // this takes effect without a reboot - and is not persisted across one.
+    // this takes effect without a reboot. Still persisted to config.network.cell_enabled.
     if (isCellularEnabled())
         bannerOptions.InitialSelected = 2;
     else

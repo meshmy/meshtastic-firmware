@@ -2,6 +2,7 @@
 
 #if HAS_CELLULAR && defined(USE_EC618)
 
+#include "NodeDB.h"
 #include "mesh/cell/cellBearer.h"
 #include "mesh/cell/cellDiagParse.h"
 
@@ -94,11 +95,8 @@ void EC618Modem::bringUpBearer(BearerStep step, ATCallback cb)
     case BEARER_CSTT: {
         // CSTT is not optional even with no APN: it moves the module from IP INITIAL to
         // IP START, and CIICR is only valid from IP START. An empty APN asks for the subscription default.
-#ifdef CELL_APN
-        String cmd = String("AT+CSTT=\"") + CELL_APN + "\",\"" + CELL_APN_USER + "\",\"" + CELL_APN_PASS + "\"";
-#else
-        String cmd = "AT+CSTT=\"\"";
-#endif
+        String cmd = String("AT+CSTT=\"") + config.network.cell_apn + "\",\"" + config.network.cell_apn_user + "\",\"" +
+                     config.network.cell_apn_pass + "\"";
         submit(cmd.c_str(), 10000, cb);
         break;
     }
