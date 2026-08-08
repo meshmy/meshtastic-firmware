@@ -186,7 +186,7 @@ typedef struct _meshtastic_LockdownAuth {
  token at unlock time: the client-supplied boots_remaining when
  non-zero, otherwise the firmware default (TOKEN_DEFAULT_BOOTS).
  Note that boots_remaining == 0 in this message means "use firmware
- default", NOT "zero boots" - a client computing the ceiling for
+ default", NOT "zero boots" — a client computing the ceiling for
  display should mirror that resolution rather than multiplying the
  raw request value.
 
@@ -196,7 +196,7 @@ typedef struct _meshtastic_LockdownAuth {
 
  Uses millis() (CPU uptime), not wall-clock time, so the cap is
  immune to GPS spoofing, RTC backup-battery removal, and Faraday
- cage isolation - none of those move the uptime counter. The only
+ cage isolation — none of those move the uptime counter. The only
  way to reset the session clock is a reboot, which costs a boot
  from the on-flash, HMAC-bound counter. */
     uint32_t max_session_seconds;
@@ -213,7 +213,7 @@ typedef struct _meshtastic_LockdownAuth {
 
  NOT reversed by this operation: APPROTECT. Once the debug port
  lockout has been burned (on silicon where it is effective) it is
- permanent - disabling lockdown decrypts your data and removes the
+ permanent — disabling lockdown decrypts your data and removes the
  access gates, but the SWD/JTAG port stays locked for the life of
  the device (recoverable only via a full chip erase over a debug
  probe, which destroys all data). Clients should make this
@@ -894,10 +894,15 @@ extern const pb_msgdesc_t meshtastic_SHTXX_config_msg;
 #define meshtastic_SHTXX_config_fields &meshtastic_SHTXX_config_msg
 
 /* Maximum encoded size of messages (where known) */
-#define MESHTASTIC_MESHTASTIC_ADMIN_PB_H_MAX_SIZE meshtastic_AdminMessage_size
+#if defined(meshtastic_Config_size) && defined(meshtastic_Config_size)
+union meshtastic_AdminMessage_payload_variant_size_union {char f6[(6 + meshtastic_Config_size)]; char f34[(7 + meshtastic_Config_size)]; char f0[500];};
+#endif
+#if defined(meshtastic_Config_size) && defined(meshtastic_Config_size)
+#define meshtastic_AdminMessage_size             (11 + sizeof(union meshtastic_AdminMessage_payload_variant_size_union))
+#endif
+#define MESHTASTIC_MESHTASTIC_ADMIN_PB_H_MAX_SIZE meshtastic_NodeRemoteHardwarePinsResponse_size
 #define meshtastic_AdminMessage_InputEvent_size  14
 #define meshtastic_AdminMessage_OTAEvent_size    36
-#define meshtastic_AdminMessage_size             511
 #define meshtastic_HamParameters_size            47
 #define meshtastic_KeyVerificationAdmin_size     25
 #define meshtastic_LockdownAuth_size             56
