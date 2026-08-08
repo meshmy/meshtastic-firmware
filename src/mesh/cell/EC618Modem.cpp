@@ -23,6 +23,21 @@ void EC618Modem::sessionInit()
             LOG_WARN("Disabling modem auto-FOTA rejected: %s", resp.c_str());
     });
 
+    // Roaming preference: read mode/acqorder/srvdomain back first so the rewrite below only
+    // ever touches <roam>, not RAT selection or CS/PS domain.
+    submit("AT^SYSCONFIG?", 5000, [this](ATResult r, const String &resp) {
+        uint8_t mode = 0, acqorder = 0, srvdomain = 0;
+        if (r != ATResult::Ok || !parseSysConfig(resp.c_str(), &mode, &acqorder, &srvdomain)) {
+            LOG_WARN("Reading ^SYSCONFIG for roaming preference failed: %s", resp.c_str());
+            return;
+        }
+        String cmd = String("AT^SYSCONFIG=") + mode + "," + acqorder + "," + CELL_ROAMING_ENABLED + "," + srvdomain;
+        submit(cmd.c_str(), 5000, [](ATResult r2, const String &resp2) {
+            if (r2 != ATResult::Ok)
+                LOG_WARN("Setting roaming preference rejected: %s", resp2.c_str());
+        });
+    });
+
 #if MODEM_SIM_HOTPLUG
     // Drive USIM_CD, so insertion and removal arrive as +CPIN URCs instead of
     // being invisible until the module is reset.

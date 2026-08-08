@@ -26,3 +26,7 @@ bool parseCopsName(const char *resp, char *out, size_t outLen);
 // +COPS: <mode>,<format>,"<oper>"[,<AcT>]. Only accepts format 2, the numeric
 // MCC/MNC. Fallback for when parseCopsName finds no name.
 bool parseCopsNumeric(const char *resp, char *out, size_t outLen);
+
+// ^SYSCONFIG: <mode>,<acqorder>,<roam>,<srvdomain>. Deliberately does not report <roam> - callers
+// read this back only to preserve mode/acqorder/srvdomain across a roaming-only rewrite.
+bool parseSysConfig(const char *resp, uint8_t *mode, uint8_t *acqorder, uint8_t *srvdomain);

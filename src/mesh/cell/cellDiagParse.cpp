@@ -184,3 +184,24 @@ bool parseCopsNumeric(const char *resp, char *out, size_t outLen)
     strcpy(out, buf);
     return true;
 }
+
+bool parseSysConfig(const char *resp, uint8_t *mode, uint8_t *acqorder, uint8_t *srvdomain)
+{
+    const char *line = findLine(resp, "^SYSCONFIG");
+    if (!line)
+        return false;
+
+    long m = intField(line, 0);
+    long a = intField(line, 1);
+    long s = intField(line, 3);
+    if (m < 0 || m > 255 || a < 0 || a > 255 || s < 0 || s > 255)
+        return false;
+
+    if (mode)
+        *mode = (uint8_t)m;
+    if (acqorder)
+        *acqorder = (uint8_t)a;
+    if (srvdomain)
+        *srvdomain = (uint8_t)s;
+    return true;
+}

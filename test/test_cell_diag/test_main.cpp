@@ -15,6 +15,7 @@ bool parseBandInd(const char *resp, uint8_t *band, uint8_t *act);
 bool parseCbcMillivolts(const char *resp, uint16_t *mv);
 bool parseCopsName(const char *resp, char *out, size_t outLen);
 bool parseCopsNumeric(const char *resp, char *out, size_t outLen);
+bool parseSysConfig(const char *resp, uint8_t *mode, uint8_t *acqorder, uint8_t *srvdomain);
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -193,6 +194,25 @@ void test_cops_output_buffer_too_small()
     TEST_ASSERT_EQUAL_STRING("", oper);
 }
 
+// --- AT^SYSCONFIG ---
+
+void test_sysconfig_typical()
+{
+    uint8_t mode = 0, acqorder = 0, srvdomain = 0;
+    TEST_ASSERT_TRUE(parseSysConfig("^SYSCONFIG: 2,0,1,3", &mode, &acqorder, &srvdomain));
+    TEST_ASSERT_EQUAL_UINT8(2, mode);
+    TEST_ASSERT_EQUAL_UINT8(0, acqorder);
+    TEST_ASSERT_EQUAL_UINT8(3, srvdomain);
+}
+
+void test_sysconfig_malformed()
+{
+    uint8_t mode = 0, acqorder = 0, srvdomain = 0;
+    TEST_ASSERT_FALSE(parseSysConfig("^SYSCONFIG: 2,0,1", &mode, &acqorder, &srvdomain));   // missing srvdomain
+    TEST_ASSERT_FALSE(parseSysConfig("+SYSCONFIG: 2,0,1,3", &mode, &acqorder, &srvdomain)); // wrong prefix
+    TEST_ASSERT_FALSE(parseSysConfig("", &mode, &acqorder, &srvdomain));
+}
+
 // --- Unity lifecycle ---
 
 void setup()
@@ -217,6 +237,8 @@ void setup()
     RUN_TEST(test_cops_name_numeric_format_refused);
     RUN_TEST(test_cops_not_registered);
     RUN_TEST(test_cops_output_buffer_too_small);
+    RUN_TEST(test_sysconfig_typical);
+    RUN_TEST(test_sysconfig_malformed);
     exit(UNITY_END());
 }
 
