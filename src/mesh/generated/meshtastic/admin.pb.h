@@ -894,15 +894,10 @@ extern const pb_msgdesc_t meshtastic_SHTXX_config_msg;
 #define meshtastic_SHTXX_config_fields &meshtastic_SHTXX_config_msg
 
 /* Maximum encoded size of messages (where known) */
-#if defined(meshtastic_Config_size) && defined(meshtastic_Config_size)
-union meshtastic_AdminMessage_payload_variant_size_union {char f6[(6 + meshtastic_Config_size)]; char f34[(7 + meshtastic_Config_size)]; char f0[500];};
-#endif
-#if defined(meshtastic_Config_size) && defined(meshtastic_Config_size)
-#define meshtastic_AdminMessage_size             (11 + sizeof(union meshtastic_AdminMessage_payload_variant_size_union))
-#endif
-#define MESHTASTIC_MESHTASTIC_ADMIN_PB_H_MAX_SIZE meshtastic_NodeRemoteHardwarePinsResponse_size
+#define MESHTASTIC_MESHTASTIC_ADMIN_PB_H_MAX_SIZE meshtastic_AdminMessage_size
 #define meshtastic_AdminMessage_InputEvent_size  14
 #define meshtastic_AdminMessage_OTAEvent_size    36
+#define meshtastic_AdminMessage_size             511
 #define meshtastic_HamParameters_size            47
 #define meshtastic_KeyVerificationAdmin_size     25
 #define meshtastic_LockdownAuth_size             56

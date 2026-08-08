@@ -463,7 +463,8 @@ typedef struct _meshtastic_CellularMetrics {
     bool has_modem_voltage_mv;
     uint32_t modem_voltage_mv;
     /* PLMN operator name, or the numeric MCC/MNC when unresolved */
-    pb_callback_t operator_name;
+    bool has_operator_name;
+    char operator_name[24];
 } meshtastic_CellularMetrics;
 
 /* Types of Measurements the telemetry module is equipped to handle */
@@ -552,7 +553,7 @@ extern "C" {
 #define meshtastic_TrafficManagementStats_init_default {0, 0, 0, 0, 0, 0, 0}
 #define meshtastic_HealthMetrics_init_default    {false, 0, false, 0, false, 0}
 #define meshtastic_HostMetrics_init_default      {0, 0, 0, false, 0, false, 0, 0, 0, 0, false, ""}
-#define meshtastic_CellularMetrics_init_default  {false, 0, false, 0, false, 0, false, 0, false, 0, {{NULL}, NULL}}
+#define meshtastic_CellularMetrics_init_default  {false, 0, false, 0, false, 0, false, 0, false, 0, false, ""}
 #define meshtastic_Telemetry_init_default        {0, 0, {meshtastic_DeviceMetrics_init_default}}
 #define meshtastic_Nau7802Config_init_default    {0, 0}
 #define meshtastic_SEN5XState_init_default       {0, 0, 0, false, 0, false, 0, false, 0}
@@ -564,7 +565,7 @@ extern "C" {
 #define meshtastic_TrafficManagementStats_init_zero {0, 0, 0, 0, 0, 0, 0}
 #define meshtastic_HealthMetrics_init_zero       {false, 0, false, 0, false, 0}
 #define meshtastic_HostMetrics_init_zero         {0, 0, 0, false, 0, false, 0, 0, 0, 0, false, ""}
-#define meshtastic_CellularMetrics_init_zero     {false, 0, false, 0, false, 0, false, 0, false, 0, {{NULL}, NULL}}
+#define meshtastic_CellularMetrics_init_zero     {false, 0, false, 0, false, 0, false, 0, false, 0, false, ""}
 #define meshtastic_Telemetry_init_zero           {0, 0, {meshtastic_DeviceMetrics_init_zero}}
 #define meshtastic_Nau7802Config_init_zero       {0, 0}
 #define meshtastic_SEN5XState_init_zero          {0, 0, 0, false, 0, false, 0, false, 0}
@@ -840,8 +841,8 @@ X(a, STATIC,   OPTIONAL, FLOAT,    rsrq,              2) \
 X(a, STATIC,   OPTIONAL, UINT32,   band,              3) \
 X(a, STATIC,   OPTIONAL, UINT32,   access_tech,       4) \
 X(a, STATIC,   OPTIONAL, UINT32,   modem_voltage_mv,   5) \
-X(a, CALLBACK, OPTIONAL, STRING,   operator_name,     6)
-#define meshtastic_CellularMetrics_CALLBACK pb_default_field_callback
+X(a, STATIC,   OPTIONAL, STRING,   operator_name,     6)
+#define meshtastic_CellularMetrics_CALLBACK NULL
 #define meshtastic_CellularMetrics_DEFAULT NULL
 
 #define meshtastic_Telemetry_FIELDLIST(X, a) \
@@ -911,10 +912,9 @@ extern const pb_msgdesc_t meshtastic_SEN5XState_msg;
 #define meshtastic_SEN5XState_fields &meshtastic_SEN5XState_msg
 
 /* Maximum encoded size of messages (where known) */
-/* meshtastic_CellularMetrics_size depends on runtime parameters */
-/* meshtastic_Telemetry_size depends on runtime parameters */
-#define MESHTASTIC_MESHTASTIC_TELEMETRY_PB_H_MAX_SIZE meshtastic_HostMetrics_size
+#define MESHTASTIC_MESHTASTIC_TELEMETRY_PB_H_MAX_SIZE meshtastic_Telemetry_size
 #define meshtastic_AirQualityMetrics_size        150
+#define meshtastic_CellularMetrics_size          59
 #define meshtastic_DeviceMetrics_size            27
 #define meshtastic_EnvironmentMetrics_size       161
 #define meshtastic_HealthMetrics_size            11
@@ -923,6 +923,7 @@ extern const pb_msgdesc_t meshtastic_SEN5XState_msg;
 #define meshtastic_Nau7802Config_size            16
 #define meshtastic_PowerMetrics_size             81
 #define meshtastic_SEN5XState_size               27
+#define meshtastic_Telemetry_size                272
 #define meshtastic_TrafficManagementStats_size   42
 
 #ifdef __cplusplus

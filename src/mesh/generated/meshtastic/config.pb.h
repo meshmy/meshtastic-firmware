@@ -558,11 +558,11 @@ typedef struct _meshtastic_Config_NetworkConfig {
     bool cell_enabled;
     /* APN to use when bringing up the cellular PDP context. Empty string asks for the
  subscription default. */
-    pb_callback_t cell_apn;
+    char cell_apn[101];
     /* Username for the cellular APN, if required */
-    pb_callback_t cell_apn_user;
+    char cell_apn_user[65];
     /* Password for the cellular APN, if required */
-    pb_callback_t cell_apn_pass;
+    char cell_apn_pass[65];
 } meshtastic_Config_NetworkConfig;
 
 /* Display Config */
@@ -842,7 +842,7 @@ extern "C" {
 #define meshtastic_Config_DeviceConfig_init_default {_meshtastic_Config_DeviceConfig_Role_MIN, 0, 0, 0, _meshtastic_Config_DeviceConfig_RebroadcastMode_MIN, 0, 0, 0, 0, "", 0, _meshtastic_Config_DeviceConfig_BuzzerMode_MIN}
 #define meshtastic_Config_PositionConfig_init_default {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _meshtastic_Config_PositionConfig_GpsMode_MIN}
 #define meshtastic_Config_PowerConfig_init_default {0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define meshtastic_Config_NetworkConfig_init_default {0, "", "", "", 0, _meshtastic_Config_NetworkConfig_AddressMode_MIN, false, meshtastic_Config_NetworkConfig_IpV4Config_init_default, "", 0, 0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define meshtastic_Config_NetworkConfig_init_default {0, "", "", "", 0, _meshtastic_Config_NetworkConfig_AddressMode_MIN, false, meshtastic_Config_NetworkConfig_IpV4Config_init_default, "", 0, 0, 0, "", "", ""}
 #define meshtastic_Config_NetworkConfig_IpV4Config_init_default {0, 0, 0, 0}
 #define meshtastic_Config_DisplayConfig_init_default {0, _meshtastic_Config_DisplayConfig_DeprecatedGpsCoordinateFormat_MIN, 0, 0, 0, _meshtastic_Config_DisplayConfig_DisplayUnits_MIN, _meshtastic_Config_DisplayConfig_OledType_MIN, _meshtastic_Config_DisplayConfig_DisplayMode_MIN, 0, 0, _meshtastic_Config_DisplayConfig_CompassOrientation_MIN, 0, 0, 0}
 #define meshtastic_Config_LoRaConfig_init_default {0, _meshtastic_Config_LoRaConfig_ModemPreset_MIN, 0, 0, 0, 0, _meshtastic_Config_LoRaConfig_RegionCode_MIN, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0, 0, 0}, 0, 0, _meshtastic_Config_LoRaConfig_FEM_LNA_Mode_MIN, 0}
@@ -853,7 +853,7 @@ extern "C" {
 #define meshtastic_Config_DeviceConfig_init_zero {_meshtastic_Config_DeviceConfig_Role_MIN, 0, 0, 0, _meshtastic_Config_DeviceConfig_RebroadcastMode_MIN, 0, 0, 0, 0, "", 0, _meshtastic_Config_DeviceConfig_BuzzerMode_MIN}
 #define meshtastic_Config_PositionConfig_init_zero {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _meshtastic_Config_PositionConfig_GpsMode_MIN}
 #define meshtastic_Config_PowerConfig_init_zero  {0, 0, 0, 0, 0, 0, 0, 0, 0}
-#define meshtastic_Config_NetworkConfig_init_zero {0, "", "", "", 0, _meshtastic_Config_NetworkConfig_AddressMode_MIN, false, meshtastic_Config_NetworkConfig_IpV4Config_init_zero, "", 0, 0, 0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define meshtastic_Config_NetworkConfig_init_zero {0, "", "", "", 0, _meshtastic_Config_NetworkConfig_AddressMode_MIN, false, meshtastic_Config_NetworkConfig_IpV4Config_init_zero, "", 0, 0, 0, "", "", ""}
 #define meshtastic_Config_NetworkConfig_IpV4Config_init_zero {0, 0, 0, 0}
 #define meshtastic_Config_DisplayConfig_init_zero {0, _meshtastic_Config_DisplayConfig_DeprecatedGpsCoordinateFormat_MIN, 0, 0, 0, _meshtastic_Config_DisplayConfig_DisplayUnits_MIN, _meshtastic_Config_DisplayConfig_OledType_MIN, _meshtastic_Config_DisplayConfig_DisplayMode_MIN, 0, 0, _meshtastic_Config_DisplayConfig_CompassOrientation_MIN, 0, 0, 0}
 #define meshtastic_Config_LoRaConfig_init_zero   {0, _meshtastic_Config_LoRaConfig_ModemPreset_MIN, 0, 0, 0, 0, _meshtastic_Config_LoRaConfig_RegionCode_MIN, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0, 0, 0}, 0, 0, _meshtastic_Config_LoRaConfig_FEM_LNA_Mode_MIN, 0}
@@ -1053,10 +1053,10 @@ X(a, STATIC,   SINGULAR, STRING,   rsyslog_server,    9) \
 X(a, STATIC,   SINGULAR, UINT32,   enabled_protocols,  10) \
 X(a, STATIC,   SINGULAR, BOOL,     ipv6_enabled,     11) \
 X(a, STATIC,   SINGULAR, BOOL,     cell_enabled,     12) \
-X(a, CALLBACK, SINGULAR, STRING,   cell_apn,         13) \
-X(a, CALLBACK, SINGULAR, STRING,   cell_apn_user,    14) \
-X(a, CALLBACK, SINGULAR, STRING,   cell_apn_pass,    15)
-#define meshtastic_Config_NetworkConfig_CALLBACK pb_default_field_callback
+X(a, STATIC,   SINGULAR, STRING,   cell_apn,         13) \
+X(a, STATIC,   SINGULAR, STRING,   cell_apn_user,    14) \
+X(a, STATIC,   SINGULAR, STRING,   cell_apn_pass,    15)
+#define meshtastic_Config_NetworkConfig_CALLBACK NULL
 #define meshtastic_Config_NetworkConfig_DEFAULT NULL
 #define meshtastic_Config_NetworkConfig_ipv4_config_MSGTYPE meshtastic_Config_NetworkConfig_IpV4Config
 
@@ -1160,18 +1160,18 @@ extern const pb_msgdesc_t meshtastic_Config_SessionkeyConfig_msg;
 #define meshtastic_Config_SessionkeyConfig_fields &meshtastic_Config_SessionkeyConfig_msg
 
 /* Maximum encoded size of messages (where known) */
-/* meshtastic_Config_size depends on runtime parameters */
-/* meshtastic_Config_NetworkConfig_size depends on runtime parameters */
-#define MESHTASTIC_MESHTASTIC_CONFIG_PB_H_MAX_SIZE meshtastic_Config_SecurityConfig_size
+#define MESHTASTIC_MESHTASTIC_CONFIG_PB_H_MAX_SIZE meshtastic_Config_size
 #define meshtastic_Config_BluetoothConfig_size   10
 #define meshtastic_Config_DeviceConfig_size      100
 #define meshtastic_Config_DisplayConfig_size     36
 #define meshtastic_Config_LoRaConfig_size        91
 #define meshtastic_Config_NetworkConfig_IpV4Config_size 20
+#define meshtastic_Config_NetworkConfig_size     440
 #define meshtastic_Config_PositionConfig_size    62
 #define meshtastic_Config_PowerConfig_size       52
 #define meshtastic_Config_SecurityConfig_size    180
 #define meshtastic_Config_SessionkeyConfig_size  0
+#define meshtastic_Config_size                   443
 
 #ifdef __cplusplus
 } /* extern "C" */
